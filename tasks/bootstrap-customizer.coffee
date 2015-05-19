@@ -19,6 +19,9 @@ module.exports = (grunt) ->
       banner: ''
       variables: {}
 
+    grunt.log.warn "Source files is not set" unless @files.length
+    variables = {}
+
     @files.forEach (f) ->
       jsonVars = f.src.filter (filepath) ->
         # Warn on and remove invalid source files (if nonull was set).
@@ -44,10 +47,12 @@ module.exports = (grunt) ->
           else
             grunt.log.warn "Source file (#{ filepath }) of variables has unknown format"
             {}
-      variables = _.extend.apply {}, jsonVars
-      variables = _.extend variables, options.variables
 
-      bootstrapCustomizer _.extend(options,
-        dest: f.dest
-        variables: variables
-      ), @async()
+      jsonVars.push(variables)
+      variables = _.extend.apply(variables, jsonVars)
+
+    variables = _.extend variables, options.variables ? {}
+
+    bootstrapCustomizer _.extend(options, variables: variables), (content) ->
+      grunt.file.write(f.dest, content)
+      @async()
