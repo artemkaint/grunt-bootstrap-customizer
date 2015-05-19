@@ -19,7 +19,7 @@ module.exports = (grunt) ->
       banner: ''
       variables: {}
 
-    grunt.log.warn "Source files is not set" unless @files.length
+    grunt.log.warn "Source files for customize bootstrap is not set" unless @files.length
     variables = {}
 
     @files.forEach (f) ->
