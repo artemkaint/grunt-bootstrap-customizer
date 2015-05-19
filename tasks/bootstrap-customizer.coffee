@@ -15,15 +15,15 @@ _ = require 'lodash'
 module.exports = (grunt) ->
   grunt.registerMultiTask 'bootstrap_customizer', 'Compile Bootstrap css with overwritted variables from JSON', ->
 
-    done = @async()
-
     options = @options
       banner: ''
       variables: {}
       dest: null
+
     unless options.dest?
       grunt.log.error "Destination file for customize bootstrap is not set"
     else
+      done = @async()
       dest = options.dest
       delete options.dest
 
