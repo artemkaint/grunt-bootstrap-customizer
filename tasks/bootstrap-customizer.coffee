@@ -8,7 +8,9 @@
 
 'use strict'
 
-bootstrapCustomizer = require('bootstrap-customizer');
+bootstrapCustomizer = require 'bootstrap-customizer'
+path = require 'path'
+_ = require 'lodash'
 
 module.exports = (grunt) ->
   grunt.registerMultiTask 'bootstrap_customizer', 'Compile Bootstrap css with overwritted variables from JSON', ->
@@ -17,5 +19,32 @@ module.exports = (grunt) ->
       banner: ''
       variables: {}
       dest: ''
+
+    @files.forEach (f) ->
+      jsonVars = f.src.filter (filepath) ->
+        # Warn on and remove invalid source files (if nonull was set).
+        unless grunt.file.exists(filepath)
+          not grunt.log.warn "Source file #{ filepath } not found."
+        else
+          true
+      .map (filepath) ->
+        # Read file source to vars object
+        switch path.extname(filepath)
+          when '.json'
+            grunt.file.readJSON(filepath)
+          when '.less'
+            content = grunt.file.read filepath, encoding: 'utf8'
+            lexemes = _.filter content.split('\n'), (item) -> item.trim()[0] is '@'
+            result = {}
+            for item in lexemes
+              splitItems = item.split /[:;]/
+              key = splitItems.shift().trim()
+              value = splitItems.shift().trim()
+              result[key] = value
+            result
+          else
+            grunt.log.warn "Source file (#{ filepath }) of variables has unknown format"
+            {}
+      options.variables = _.extend.apply options.variables, jsonVars.push(options.variables)
 
     bootstrapCustomizer options, @async()
