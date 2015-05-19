@@ -18,7 +18,6 @@ module.exports = (grunt) ->
     options = @options
       banner: ''
       variables: {}
-      dest: ''
 
     @files.forEach (f) ->
       jsonVars = f.src.filter (filepath) ->
@@ -45,6 +44,10 @@ module.exports = (grunt) ->
           else
             grunt.log.warn "Source file (#{ filepath }) of variables has unknown format"
             {}
-      options.variables = _.extend.apply options.variables, jsonVars.push(options.variables)
+      variables = _.extend.apply {}, jsonVars
+      variables = _.extend variables, options.variables
 
-    bootstrapCustomizer options, @async()
+      bootstrapCustomizer _.extend(options,
+        dest: f.dest
+        variables: variables
+      ), @async()
