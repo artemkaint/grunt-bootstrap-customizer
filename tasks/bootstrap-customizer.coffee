@@ -63,4 +63,5 @@ module.exports = (grunt) ->
 
       bootstrapCustomizer _.extend(options, variables: variables), (content) ->
         grunt.file.write(dest, content)
+        grunt.log.ok "Customized bootstrap file #{ dest } successfully created."
         done()
